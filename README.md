@@ -1,4 +1,4 @@
-# Telegram Background Remover Bot (Video & GIF) — Production-Ready
+# Telegram Background Remover Bot (Video & GIF)
 
 This repo gives you a production-grade Telegram bot that removes backgrounds from **MP4s and GIFs** using a **hosted API** (Replicate's Robust Video Matting). No GPUs to manage, just deploy and go. Includes job queue, worker, Docker, and docker-compose.
 
