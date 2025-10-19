@@ -1,8 +1,7 @@
 import os
 import subprocess
 from telegram import Bot
-from .config import TELEGRAM_BOT_TOKEN, BACKEND
-from .processing.replicate_video import process_video as process_video_replicate
+from .config import TELEGRAM_BOT_TOKEN
 from .processing.bgremover_local import process_video as process_video_local
 from .utils.logger import get_logger
 
@@ -44,12 +43,8 @@ def shrink_gif(in_path, max_size_mb=5):
 def process_and_reply(chat_id: int, status_msg_id: int, input_path: str):
     """Run background removal and send compressed GIF back to Telegram."""
     try:
-        # Choose backend
-        result = (
-            process_video_replicate(input_path)
-            if BACKEND == "replicate"
-            else process_video_local(input_path)
-        )
+        # Process locally via backgroundremover CLI
+        result = process_video_local(input_path)
 
         output_url = result.get("output_url")
         local_path = result.get("output_path")
@@ -62,7 +57,7 @@ def process_and_reply(chat_id: int, status_msg_id: int, input_path: str):
         except Exception as e:
             log.warning(f"Failed to edit status message: {e}")
 
-        # If we got a downloadable URL from Replicate
+        # If the processor returned a downloadable URL
         if output_url:
             bot.send_animation(chat_id=chat_id, animation=output_url)
         elif local_path:
