@@ -10,7 +10,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # Ensure required environment variables exist before importing config
 os.environ.setdefault("TELEGRAM_BOT_TOKEN", "test-token")
-os.environ.setdefault("REPLICATE_API_TOKEN", "test-token")
 
 from app import handlers  # noqa: E402
 
