@@ -5,3 +5,5 @@ rq==1.16.2
 python-dotenv==1.0.1
 requests==2.32.3
 tqdm==4.66.5
+
+backgroundremover==0.3.4
