@@ -64,6 +64,7 @@ README.md
 - For GIF input, Telegram sends it as `animation`. We normalize flow so both go through the same pipeline.
 - **Transparency**: `backgroundremover` outputs videos with alpha (MOV/WebM). Telegram will transcode on upload, so expect MP4 output even though transparency is preserved during processing.
 - **First run**: The backgroundremover CLI downloads model weights on first use. Allow a little extra time for the initial job.
+- **CPU by default**: We default to CPU execution so systems without NVIDIA drivers (or with unstable GPU runtimes) stay stable. Set `BACKGROUNDREMOVER_DEVICE` to `cuda` or `mps` if you explicitly want GPU acceleration.
 - **Privacy**: Everything runs locally in the worker container—no third-party API calls.
 - **Scaling**: Add more `worker` replicas. RQ + Redis makes it horizontal.
 - **Limits**: You can tune `MAX_FILE_MB` and allowed durations in `.env`.
@@ -80,6 +81,7 @@ Optional:
 - `QUEUE_NAME=bgremove`
 - `MAX_FILE_MB=50`
 - `LOG_LEVEL=INFO`
+- `BACKGROUNDREMOVER_DEVICE=cpu` (set to `cuda` or `mps` to opt into GPU/Metal acceleration)
 
 ---
 
