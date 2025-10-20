@@ -29,8 +29,30 @@ def process_video(input_path: str) -> dict:
         "-tv",
         "-o", out_path,
     ]
+
+    env = os.environ.copy()
+    device_pref = env.get("BACKGROUNDREMOVER_DEVICE", "cpu").strip().lower()
+
+    if device_pref in {"cpu", ""}:
+        # Hide CUDA devices so PyTorch never attempts to load NVIDIA runtimes.
+        env.setdefault("CUDA_VISIBLE_DEVICES", "")
+        # Encourage PyTorch to stay on CPU even if MPS is available (macOS).
+        env.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+        log.debug("backgroundremover forced to CPU mode via BACKGROUNDREMOVER_DEVICE=%s", device_pref or "cpu")
+    elif device_pref == "mps":
+        # Disable CUDA while still allowing Apple's Metal backend.
+        env.setdefault("CUDA_VISIBLE_DEVICES", "")
+        env.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")
+    # Any other value leaves the environment untouched so CUDA/MPS can be used.
+
     log.info("Running: %s", " ".join(cmd))
-    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    proc = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        env=env,
+    )
     if proc.returncode != 0:
         log.error("backgroundremover failed: %s", proc.stderr[-1000:])
         raise RuntimeError(f"backgroundremover failed: {proc.stderr.splitlines()[-1] if proc.stderr else 'unknown error'}")
